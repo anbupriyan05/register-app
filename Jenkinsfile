@@ -8,7 +8,7 @@ pipeline {
 	    APP_NAME = "register-app-pipeline"
             RELEASE = "1.0.0"
             DOCKER_USER = "anbupriyan"
-            DOCKER_PASS = 'dockerhub'
+            DOCKER_PASS = 'anbupriyanms05'
             IMAGE_NAME = "${DOCKER_USER}" + "/" + "${APP_NAME}"
             IMAGE_TAG = "${RELEASE}-${BUILD_NUMBER}"
 	    JENKINS_API_TOKEN = credentials("JENKINS_API_TOKEN")
@@ -22,7 +22,7 @@ pipeline {
 
         stage("Checkout from SCM"){
                 steps {
-                    git branch: 'main', credentialsId: 'github', url: 'https://github.com/anbupriyan05/register-app.git'
+                    git branch: 'main', credentialsId: 'github', url: 'https://github.com/anbupriyan05/register-app'
                 }
         }
 
@@ -77,7 +77,7 @@ pipeline {
        stage("Trivy Scan") {
            steps {
                script {
-	            sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image anbupriyan/register-app-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table')
+	            sh ('docker run -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image ashfaque9x/register-app-pipeline:latest --no-progress --scanners vuln  --exit-code 0 --severity HIGH,CRITICAL --format table')
                }
            }
        }
@@ -100,3 +100,16 @@ pipeline {
        }
     }
 
+    post {
+       failure {
+             emailext body: '''${SCRIPT, template="groovy-html.template"}''', 
+                      subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Failed", 
+                      mimeType: 'text/html',to: "anbupriyanms05@gmail.com"
+      }
+      success {
+            emailext body: '''${SCRIPT, template="groovy-html.template"}''', 
+                     subject: "${env.JOB_NAME} - Build # ${env.BUILD_NUMBER} - Successful", 
+                     mimeType: 'text/html',to: "anbupriyanms05@gmail.com"
+      }      
+   }
+}
